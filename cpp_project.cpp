@@ -58,7 +58,7 @@ class block_info
 				rooms_filled=0;
 				number_of_students=0;
 			}
-			virtual int create_entry(student* s, block_info* n, fstream &newBlock_file)
+			virtual int create_entry(student* s, block_info* n)
 			{
 			}
 			virtual void remove_entry(student s,int room,block_info *n)
@@ -83,7 +83,7 @@ class newBlock : public block_info
 				total_rooms=200;
 				seats_empty=200*3;
 			}
-			int create_entry(student *s,block_info *n, fstream &newBlock_file)
+			int create_entry(student *s,block_info *n)
 			{
 				if( n->rooms_filled == 200)
 				{
@@ -91,24 +91,6 @@ class newBlock : public block_info
 				}				
 				for(int i=0; i<200; i++)
 				{
-					string req;
-					int insert=0;
-					getline(newBlock_file,req);
-					char char_array[6]; 
-					strcpy(char_array, req.c_str()); 
-					for (int j=5; j>0 ; j--)
-					{
-						if(isdigit(char_array[j]))
-						{
-							string l(1,char_array[j]); 
-							insert = stoi(l);
-							j-=6;
-						}
-					}
-					b[i].no_filled=insert;
-					b[i].no_empty=3-b[i].no_filled;
-					newBlock_file.close();
-					newBlock_file.open("NewBlockDataBase.dat", ios::out | ios::in | ios::app);
 					if(b[i].no_filled == 0)
 					{
 						b[i].stud[b[i].no_filled]=*s;
@@ -117,7 +99,7 @@ class newBlock : public block_info
 						b[i].student_sem_exist=n->student_sem_enter;
 						n->number_of_students++;
 						seats_empty--;
-						newBlock_file << b[i].no_filled<<"\t";
+						//newBlock_file << b[i].no_filled<<"\t";
 						return i+1;
 					}
 					else if((n->student_sem_enter == b[i].student_sem_exist) && b[i].no_empty !=0)
@@ -134,10 +116,10 @@ class newBlock : public block_info
 							n->rooms_empty--;
 						}
 						
-						if(b[i].no_filled==3)
-							newBlock_file << b[i].no_filled<<"\n";
-						else
-							newBlock_file << b[i].no_filled<<"\t";
+					//	if(b[i].no_filled==3)
+					//		newBlock_file << b[i].no_filled<<"\n";
+					//	else
+							//newBlock_file << b[i].no_filled<<"\t";
 						return i+1;
 					}
 					else if((n->student_sem_enter == b[i].student_sem_exist) && b[i].no_empty !=0)
@@ -439,7 +421,7 @@ class messBlock : public block_info
 			}
 };
 
-void new_allotment(student *s,block_info *n,int pref, fstream &newBlock_file)
+void new_allotment(student *s,block_info *n,int pref)
 {
 	string block;
 	switch(pref)
@@ -456,7 +438,7 @@ void new_allotment(student *s,block_info *n,int pref, fstream &newBlock_file)
 	n->student_sem_enter=s->sem;
 	if(n->rooms_empty != 0)
 	{
-		int room_given = n->create_entry(s,n,newBlock_file);
+		int room_given = n->create_entry(s,n);
 		if(room_given==0)
 		{
 			cout<<"\t\t\t\tEntry Unsuccessfull\n";
@@ -632,7 +614,6 @@ int main()
 	student stud_array[500];
 	
 	fstream student_file;
-	fstream newBlock_file;
 	
 	student_file.open("StudentDataBase.dat", ios::out | ios::in | ios::app);
 	
@@ -664,8 +645,6 @@ int main()
         }
     }
 	student_file.close();
-	
-	newBlock_file.open("NewBlockDataBase.dat", ios::out | ios::in | ios::app);
 	
 	student_file.open("StudentDataBase.dat", ios::out | ios::in | ios::app);
 	
@@ -714,14 +693,14 @@ int main()
 					switch(s.preference)
 					{
 						case 1:{
-								new_allotment(&s,&n,s.preference, newBlock_file);
+								new_allotment(&s,&n,s.preference);
 								}
 								break;
-						case 2:new_allotment(&s,&it,s.preference, newBlock_file);
+						case 2:new_allotment(&s,&it,s.preference);
 								break;
-						case 3:new_allotment(&s,&m,s.preference, newBlock_file);
+						case 3:new_allotment(&s,&m,s.preference);
 								break;
-						case 4:new_allotment(&s,&ih,s.preference, newBlock_file);
+						case 4:new_allotment(&s,&ih,s.preference);
 								break;
 					}
 						stud_array[i++]=s;
